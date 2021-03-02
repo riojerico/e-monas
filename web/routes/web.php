@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\LkkaController;
 use App\Http\Controllers\MainLkkaController;
+use App\Http\Controllers\MainSp2dController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,8 +17,6 @@ use App\Http\Controllers\MainLkkaController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/test-lkka', 
-    	[MainLkkaController::class, 'LKKA_View']);
 
 Route::group(['middleware' => 'auth'], function () {
    	//Route::auth();
@@ -26,15 +25,35 @@ Route::group(['middleware' => 'auth'], function () {
     	[MainController::class, 'dashboard'])
     ->name('dashboard');
 
+    ######### SP2D #############
+
 	Route::get('/sp2d', [MainController::class, 'sp2d_view'])->name('sp2d');
 
 	Route::post('/sp2d/store', [MainController::class, 'sp2d_store'])->name('sp2d.store');
 	
 	Route::post('/sp2d-detail/{id}/store', [MainController::class, 'sp2d_akun_store'])->name('sp2d.detail.store');
 
+	Route::post('/sp2d-detail/{id}/edit', [MainController::class, 'sp2d_akun_edit'])->name('sp2d.detail.edit');
+
+	Route::post('/sp2d-detail/{id}/delete', [MainController::class, 'sp2d_akun_destroy'])->name('sp2d.detail.delete');
+
 	Route::get('/sp2d-detail/{id}', [MainController::class, 'sp2d_view_detail'])->name('sp2d.detail');
 
-	Route::get('/lkka', [MainController::class, 'lkka_view'])->name('lkka');
+	Route::get('/sp2d-detail/{id}?button=delete', [MainController::class, 'sp2d_view_detail'])->name('sp2d.detail.delete-btn');
+
+	Route::post('/sp2d-valid/{id}', [MainSp2dController::class, 'akun_validasi'])->name('sp2d.valid');
+
+	Route::post('/sp2d-valid/{id}/store', [MainSp2dController::class, 'akun_validasi_store'])->name('sp2d.valid.store');
+
+
+	######### SP2D #############
+
+	######### LKKA #############
+
+	Route::get('/lkka', [MainLkkaController::class, 'LKKA_View'])->name('lkka');	
+
+	######### LKKA #############
+
 
 	####### AKTIVITAS #####
 

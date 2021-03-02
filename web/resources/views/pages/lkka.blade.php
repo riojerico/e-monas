@@ -43,26 +43,26 @@
                   @foreach($program as $programs)
                   
                   <tr>
-                    <td class="text-left">
+                    <td class="text-left" width="25%">
                       <b><font color="#483D8B">
                       <a href="{{ route('lkka_act', $programs->id_prog) }}">{{ $programs->kode_prog.' '.$programs->nama_program }}</a>
                       </font></b>
                     </td>
                     <td><font color="#483D8B"><b>
-                      
+                      {{ number_format($pagu_program[$loop->index]) }}
                     </b></font></td>
-                    <td><font color="#483D8B"><b></b>
-
-                    </font></td>
-                    <td><font color="#483D8B"><b></b>
-
-                    </font></td>
-                    <td><font color="#483D8B"><b></b>
-
-                    </font></td>
-                    <td><font color="#483D8B"><b></b>
-
-                    </font></td>
+                    <td><font color="#483D8B"><b>
+                      {{ number_format($real_prog_last[$loop->index]) }}
+                    </b></font></td>
+                    <td><font color="#483D8B"><b>
+                      {{ number_format($real_prog_curr[$loop->index]) }}
+                    </b></font></td>
+                    <td><font color="#483D8B"><b>
+                      {{ number_format($real_prog_tott[$loop->index]) }}
+                    </b></font></td>
+                    <td><font color="#483D8B"><b>
+                       {{ number_format($pagu_program[$loop->index]-$real_prog_tott[$loop->index]) }}
+                    </b></font></td>
                     <td><font color="#483D8B"><b></b></font></td>        
                   </tr>        
                         
@@ -72,23 +72,33 @@
                     <tr>
                       <td class="text-left">
                         <a href="{{route('lkka_kro', $acts->id_act)}}">
-                        <b><font color="#6495ED">{{ $acts->kode_act.' '.$acts->nama_aktivitas }}</font></b>
+                        <b><font color="#6495ED">&nbsp;{{ $acts->kode_act.' '.$acts->nama_aktivitas }}</font></b>
                         </a>
                       </td>
                       <td><b>
-                        <font color="#6495ED"></font></b>
+                        <font color="#6495ED">
+                          {{ number_format($pagu_aktivitas[$i2]) }}
+                        </font></b>
                       </td>
                       <td><b>
-                        <font color="#6495ED"></font></b>
+                        <font color="#6495ED">
+                          {{ number_format($real_act_last[$i2]) }}
+                        </font></b>
                       </td>
                       <td><b>
-                        <font color="#6495ED"></font></b>
+                        <font color="#6495ED">
+                          {{ number_format($real_act_curr[$i2]) }}
+                        </font></b>
                       </td>
                       <td><b>
-                        <font color="#6495ED"></font></b>
+                        <font color="#6495ED">
+                          {{ number_format($real_act_tott[$i2]) }}
+                        </font></b>
                       </td>
                       <td><b>
-                        <font color="#6495ED"></font></b>
+                        <font color="#6495ED">
+                        {{ number_format($pagu_aktivitas[$i2]-$real_act_tott[$i2]) }}
+                      </font></b>
                       </td>
                       <td></td>
                     </tr>                                                                             
@@ -98,25 +108,25 @@
                            <tr>
                             <td class="text-left">
                               <a href="{{route('lkka_ro', $kros->id_kro)}}">
-                              <b><font color="red"> 
+                              <b><font color="red">&nbsp;&nbsp; 
                               {{ $kros->kode_act.'.'.$kros->kode_kro.' '.$kros->kro }}
                             </font></b>
                               </a>
                           </td>
                             <td><b><font color="red"> 
-                              
+                              {{ number_format($pagu_kro[$i3]) }}
                             </font></b></td>
                             <td><b><font color="red"> 
-                             
+                              {{ number_format($real_kro_last[$i3]) }}
                             </font></b></td>
                             <td><b><font color="red"> 
-                              
+                              {{ number_format($real_kro_curr[$i3]) }}
                             </font></b></td>
                             <td><b><font color="red"> 
-                              
+                              {{ number_format($real_kro_tott[$i3]) }}
                             </font></b></td>
                             <td><b><font color="red"> 
-                            
+                              {{ number_format($pagu_kro[$i3]-$real_kro_tott[$i3]) }}
                             </font></b></td>
                             <td></td>
                           </tr>
@@ -124,18 +134,30 @@
                           @foreach($ro[$i3] as $ros)
                             @if(isset($ros->kode_ro)) 
                             <tr>
-                              <td class="text-left">
+                              <td class="text-left" width="">
                                 <a href="{{ route('lkka_komponen', $ros->id_ro) }}">
                                 <font color="black">
-                                <b>{{ $kros->kode_act.'.'.$kros->kode_kro.'.'.$ros->kode_ro.' '.$ros->ro }}</b>
+                                <b>&nbsp;&nbsp;&nbsp;
+                                  {{ $ros->kode_ro.' '.$ros->ro }}
+                                </b>
                                 </font>
                                 </a>
                               </td>
-                              <td><b></b></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                              <td><b>
+                                {{ number_format($pagu_ro[$i4]) }}
+                              </b></td>
+                              <td><b>
+                                {{ number_format($real_ro_last[$i4]) }}
+                              </b></td>
+                              <td><b>
+                                {{ number_format($real_ro_curr[$i4]) }}
+                              </b></td>
+                              <td><b>
+                                {{ number_format($real_ro_tott[$i4]) }}
+                              </b></td>
+                              <td><b>
+                                {{ number_format($pagu_ro[$i4]-$real_ro_tott[$i4]) }}
+                              </b></td>
                               <td></td>
                             </tr>
                             {{-- for komponen --}}
@@ -144,16 +166,26 @@
                             <tr>
                               <td class="text-left">
                                 <a href="{{ route('lkka_subkomponen', $komp->id_komp) }}">
-                                  <font color="black">
-                                {{ $kros->kode_act.'.'.$kros->kode_kro.'.'.$ros->kode_ro.'.'.$komp->kode_komponen.' '.$komp->komponen }}
+                                  <font color="black">&nbsp;&nbsp;&nbsp;&nbsp;
+                                {!! '<b>'.$komp->kode_komponen.'</b> '.$komp->komponen !!}
                               </font>
                               </a>
                               </td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                              <td>
+                                {{ number_format($pagu_komponen[$i5]) }}
+                              </td>
+                              <td>
+                                {{ number_format($real_komp_last[$i5]) }}
+                              </td>
+                              <td>
+                                {{ number_format($real_komp_curr[$i5]) }}
+                              </td>
+                              <td>
+                                {{ number_format($real_komp_tott[$i5]) }}
+                              </td>
+                              <td>
+                                {{ number_format($pagu_komponen[$i5]-$real_komp_tott[$i5]) }}
+                              </td>
                               <td></td>
                             </tr>
                             {{-- for sub komponen --}}
@@ -162,16 +194,26 @@
                                 <tr>
                                   <td class="text-left">
                                     <a href="{{ route('lkka_akun',$sub->id_sub) }}">
-                                      <font color="black">
+                                      <font color="black">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     <u><i>{{ $sub->kode_subkomponen.' '.$sub->subkomponen }}</i></u>
                                       </font>
                                     </a>
                                   </td>
-                                  <td><u><i></i></u></td>
-                                  <td></td>
-                                  <td></td>
-                                  <td></td>
-                                  <td></td>
+                                  <td><u><i>
+                                    {{ number_format($pagu_subkomponen[$i6]) }}
+                                  </i></u></td>
+                                  <td><u><i>
+                                    {{ number_format($real_sub_last[$i6]) }}
+                                  </i></u></td>
+                                  <td><u><i>
+                                    {{ number_format($real_sub_curr[$i6]) }}
+                                  </i></u></td>
+                                  <td><u><i>
+                                    {{ number_format($real_sub_tott[$i6]) }}
+                                  </i></u></td>
+                                  <td><u><i>
+                                    {{ number_format($pagu_subkomponen[$i6]-$real_sub_tott[$i6]) }}
+                                  </i></u></td>
                                   <td>
                                     
                                   </td>
@@ -180,12 +222,24 @@
                                 @foreach($akuns[$i6] as $akun)
                                 @if(isset($akun->akun)) 
                                 <tr>
-                                  <td class="text-left">{{ $akun->akun }}</td>
-                                  <td></td>
-                                  <td></td>
-                                  <td></td>
-                                  <td></td>
-                                  <td></td>
+                                  <td class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
+                                    {{ $akun->akun.' ('.$akun->uraian.')' }}
+                                  </td>
+                                  <td>
+                                    {{ number_format($akun->anggaran) }}
+                                  </td>
+                                  <td>
+                                    {{ number_format($real_akun_last[$i7]) }}
+                                  </td>
+                                  <td>
+                                    {{ number_format($real_akun_curr[$i7]) }}
+                                  </td>
+                                  <td>
+                                    {{ number_format($real_akun_tott[$i7]) }}
+                                  </td>
+                                  <td>
+                                    {{ number_format($akun->anggaran-$real_akun_tott[$i7]) }}
+                                  </td>
                                   <td>
                                     <u><i>
                                       @if($akun->sumber_dana == "PNBP")

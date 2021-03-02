@@ -15,9 +15,26 @@ class MainLkkaController extends Controller
         $first_day_month = date("Y-m-d", strtotime("first day of this month"));
         $curr_month = date('Y-m-d');
         $prev_month = date('Y-m',strtotime("-1 month"));
-        $lastdate_prevmonth = DB::table('view_trans_sp2d_akun')->select('tanggal')->where('tanggal','like', $prev_month.'%')->orderBy('tanggal','desc')->limit(1)->get();
-        $res_lastdate_prevmonth = $lastdate_prevmonth[0]->tanggal;
-                
+
+        //view_trans_sp2d_akun untuk ambil data realisasi dari sp2d SPAN
+        $trans_sp2d_akun = DB::table('view_trans_sp2d_akun')->get();
+
+        if (isset($trans_sp2d_akun[0]->akun)) {
+            $lastdate_prevmonth = DB::table('view_trans_sp2d_akun')->select('tanggal')->where('tanggal','like', $prev_month.'%')->orderBy('tanggal','desc')->limit(1)->get();
+            if (empty($lastdate_prevmonth[0]->tanggal)) {
+                $res_lastdate_prevmonth = $prev_month.'-01';                
+            }else{
+                $res_lastdate_prevmonth = $lastdate_prevmonth[0]->tanggal;
+            }
+        }else{
+            
+           
+          
+        }
+        
+
+        // dd($trans_sp2d_akun);
+
         $i=0;
         $i2=0;
         $i3=0;
@@ -30,9 +47,40 @@ class MainLkkaController extends Controller
         	##pagu program
             $pagu_program[] = DB::table('view_lkka_raw')
             				->where('id_prog', $prog->id_prog)
-            				->orderBy('id_prog')
+            				->orderBy('kode_prog')
             				->sum('anggaran');
             ##pagu program
+
+            if (isset($trans_sp2d_akun[0]->akun)) {
+            ## Realisasi sampai dengan bulan lalu
+            $real_prog_last[] = DB::table('view_trans_sp2d_akun')
+                                ->where('program', $prog->kode_prog)
+                                ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
+                                ->sum('nilai');
+            
+            ## Realisasi sampai dengan bulan lalu
+
+            ## Realisasi sampai dengan bulan ini
+            $real_prog_curr[] = DB::table('view_trans_sp2d_akun')
+                                ->where('program', $prog->kode_prog)
+                                ->whereBetween('tanggal', [$first_day_month, $curr_month])
+                                ->sum('nilai');
+            ## Realisasi sampai dengan bulan ini
+
+            ## Realisasi total
+            $real_prog_tott[] = DB::table('view_trans_sp2d_akun')
+                                ->where('program', $prog->kode_prog)
+                                ->whereBetween('tanggal', [$first_day, $curr_month])
+                                ->sum('nilai');
+            ## Realisasi total
+            }else{
+                $real_prog_last[] = 0;
+                $real_prog_curr[] = 0;
+                $real_prog_tott[] = 0;
+            }
+
+
+
 
         	####### Aktivitas ########
             ${'aktivitas'.$i} = DB::table('view_lkka_raw')
@@ -45,6 +93,45 @@ class MainLkkaController extends Controller
             ####### Aktivitas ########
 
             foreach (${'aktivitas'.$i} as $act) {
+            	##pagu aktivitas
+            	if ($act->id_act) {
+
+                    if (isset($trans_sp2d_akun[0]->akun)) {
+                    ## Realisasi sampai dengan bulan lalu
+                    $real_act_last[] = DB::table('view_trans_sp2d_akun')
+                    ->where('kegiatan', $act->kode_act)
+                    ->where('program', $prog->kode_prog)
+                    ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
+                    ->sum('nilai');
+                    ## Realisasi sampai dengan bulan lalu
+
+                    ## Realisasi sampai dengan bulan ini
+                    $real_act_curr[] = DB::table('view_trans_sp2d_akun')
+                    ->where('kegiatan', $act->kode_act)
+                    ->where('program', $prog->kode_prog)
+                    ->whereBetween('tanggal', [$first_day_month, $curr_month])
+                    ->sum('nilai');
+                    ## Realisasi sampai dengan bulan ini
+
+                    ## Realisasi total
+                    $real_act_tott[] = DB::table('view_trans_sp2d_akun')
+                    ->where('kegiatan', $act->kode_act)
+                    ->where('program', $prog->kode_prog)
+                    ->whereBetween('tanggal', [$first_day, $curr_month])
+                    ->sum('nilai');
+                    ## Realisasi total
+                    }else{
+                        $real_act_last[] = 0;
+                        $real_act_curr[] = 0;
+                        $real_act_tott[] = 0;
+                    }
+
+            		$pagu_aktivitas[] = DB::table('view_lkka_raw')
+	            				->where('id_act', $act->id_act)
+	            				->orderBy('kode_act')
+	            				->sum('anggaran');
+            	}	            
+	            ##pagu aktivitas
 
             	if (isset($act->id_act)) {
             		######## KRO ########
@@ -57,6 +144,50 @@ class MainLkkaController extends Controller
                     $kro[] = ${'kro'.$i2};
                     ######## KRO ########
                     foreach (${'kro'.$i2} as $kros) {
+                    
+                    ##pagu kro
+                    if ($kros->id_kro) {
+
+                        if (isset($trans_sp2d_akun[0]->akun)) {
+                        ## Realisasi sampai dengan bulan lalu
+                        $real_kro_last[] = DB::table('view_trans_sp2d_akun')
+                        ->where('kro', $kros->kode_kro)
+                        ->where('kegiatan', $act->kode_act)
+                        ->where('program', $prog->kode_prog)
+                        ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
+                        ->sum('nilai');
+                        ## Realisasi sampai dengan bulan lalu
+
+                        ## Realisasi sampai dengan bulan ini
+                        $real_kro_curr[] = DB::table('view_trans_sp2d_akun')
+                        ->where('kro', $kros->kode_kro)
+                        ->where('kegiatan', $act->kode_act)
+                        ->where('program', $prog->kode_prog)
+                        ->whereBetween('tanggal', [$first_day_month, $curr_month])
+                        ->sum('nilai');
+                        ## Realisasi sampai dengan bulan ini
+
+                        ## Realisasi total
+                        $real_kro_tott[] = DB::table('view_trans_sp2d_akun')
+                        ->where('kro', $kros->kode_kro)
+                        ->where('kegiatan', $act->kode_act)
+                        ->where('program', $prog->kode_prog)
+                        ->whereBetween('tanggal', [$first_day, $curr_month])
+                        ->sum('nilai');
+                        ## Realisasi total
+                        }else{
+                            $real_kro_last[] = 0;
+                            $real_kro_curr[] = 0;
+                            $real_kro_tott[] = 0;
+                        }
+
+                    	$pagu_kro[] = DB::table('view_lkka_raw')
+		            				->where('id_kro', $kros->id_kro)
+		            				->orderBy('kode_kro')
+		            				->sum('anggaran');		            	
+                    }
+		            ##pagu kro
+
                       	if (isset($kros->id_kro)) {
                       		######### RO ########
                             ${'ro'.$i3} = DB::table('view_lkka_raw')
@@ -68,6 +199,53 @@ class MainLkkaController extends Controller
                             $ro[] = ${'ro'.$i3};
                             ######### RO ########
                             foreach (${'ro'.$i3} as $ros) {
+
+                            ##pagu ro
+		                    if (isset($ros->id_ro)) {
+
+                                if (isset($trans_sp2d_akun[0]->akun)) {
+                                ## Realisasi sampai dengan bulan lalu
+                                $real_ro_last[] = DB::table('view_trans_sp2d_akun')
+                                ->where('ro', $ros->kode_ro)
+                                ->where('kro', $kros->kode_kro)
+                                ->where('kegiatan', $act->kode_act)
+                                ->where('program', $prog->kode_prog)
+                                ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
+                                ->sum('nilai');
+                                ## Realisasi sampai dengan bulan lalu
+
+                                ## Realisasi sampai dengan bulan ini
+                                $real_ro_curr[] = DB::table('view_trans_sp2d_akun')
+                                ->where('ro', $ros->kode_ro)
+                                ->where('kro', $kros->kode_kro)
+                                ->where('kegiatan', $act->kode_act)
+                                ->where('program', $prog->kode_prog)
+                                ->whereBetween('tanggal', [$first_day_month, $curr_month])
+                                ->sum('nilai');
+                                ## Realisasi sampai dengan bulan ini
+
+                                ## Realisasi total
+                                $real_ro_tott[] = DB::table('view_trans_sp2d_akun')
+                                ->where('ro', $ros->kode_ro)
+                                ->where('kro', $kros->kode_kro)
+                                ->where('kegiatan', $act->kode_act)
+                                ->where('program', $prog->kode_prog)
+                                ->whereBetween('tanggal', [$first_day, $curr_month])
+                                ->sum('nilai');
+                                ## Realisasi total
+                                }else{
+                                    $real_ro_last[] = 0;
+                                    $real_ro_curr[] = 0;
+                                    $real_ro_tott[] = 0;
+                                }
+
+		                    	$pagu_ro[] = DB::table('view_lkka_raw')
+				            				->where('id_ro', $ros->id_ro)
+				            				->orderBy('kode_ro')
+				            				->sum('anggaran');		            	
+		                    }
+				            ##pagu ro
+
                             	if (isset($ros->id_ro)) {
                             		## Komponen
 	                                ${'komponen'.$i4} = DB::table('view_lkka_raw')
@@ -78,6 +256,55 @@ class MainLkkaController extends Controller
 	                                $komponen[] = ${'komponen'.$i4};
 	                                ## Komponen
 	                                foreach (${'komponen'.$i4} as $komp) {
+	                                ##pagu komponen
+				                    if (isset($komp->id_komp)) {
+
+                                        if (isset($trans_sp2d_akun[0]->akun)) {
+                                        ## Realisasi sampai dengan bulan lalu
+                                        $real_komp_last[] = DB::table('view_trans_sp2d_akun')
+                                        ->where('komponen', $komp->kode_komponen)
+                                        ->where('ro', $ros->kode_ro)
+                                        ->where('kro', $kros->kode_kro)
+                                        ->where('kegiatan', $act->kode_act)
+                                        ->where('program', $prog->kode_prog)
+                                        ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
+                                        ->sum('nilai');
+                                        ## Realisasi sampai dengan bulan lalu
+
+                                        ## Realisasi sampai dengan bulan ini
+                                        $real_komp_curr[] = DB::table('view_trans_sp2d_akun')
+                                        ->where('komponen', $komp->kode_komponen)
+                                        ->where('ro', $ros->kode_ro)
+                                        ->where('kro', $kros->kode_kro)
+                                        ->where('kegiatan', $act->kode_act)
+                                        ->where('program', $prog->kode_prog)
+                                        ->whereBetween('tanggal', [$first_day_month, $curr_month])
+                                        ->sum('nilai');
+                                        ## Realisasi sampai dengan bulan ini
+
+                                        ## Realisasi total
+                                        $real_komp_tott[] = DB::table('view_trans_sp2d_akun')
+                                        ->where('komponen', $komp->kode_komponen)
+                                        ->where('ro', $ros->kode_ro)
+                                        ->where('kro', $kros->kode_kro)
+                                        ->where('kegiatan', $act->kode_act)
+                                        ->where('program', $prog->kode_prog)
+                                        ->whereBetween('tanggal', [$first_day, $curr_month])
+                                        ->sum('nilai');
+                                        ## Realisasi total
+                                        }else{
+                                            $real_komp_last[] = 0;
+                                            $real_komp_curr[] = 0;
+                                            $real_komp_tott[] = 0;
+                                        }
+
+				                    	$pagu_komponen[] = DB::table('view_lkka_raw')
+						            				->where('id_komp', $komp->id_komp)
+						            				->orderBy('kode_komponen')
+						            				->sum('anggaran');		            	
+				                    }
+						            ##pagu komponen
+
                                         if (isset($komp->kode_komponen)) {
                                         ## Subkomponen
                                         ${'subkomponen'.$i5} = DB::table('view_lkka_raw')
@@ -89,12 +316,117 @@ class MainLkkaController extends Controller
                                         $subkomponen[] = ${'subkomponen'.$i5};
                                         ## Subkomponen
 	                                        foreach (${'subkomponen'.$i5} as $sub) {
+	                                        ##pagu komponen
+						                    if (isset($sub->id_sub)) {
+                                                ### jika merupakan gaji tidak perlu cek komponen
+                                                ${'cek_trans_sp2d_akun'.$i6} = DB::table('view_trans_sp2d_akun')
+                                                ->get();
+                                                
+
+                                                    if (isset($trans_sp2d_akun[0]->akun)) {
+                                                    ## Realisasi sampai dengan bulan lalu
+                                                    $real_sub_last[] = DB::table('view_trans_sp2d_akun')
+                                                    ->where('subkomponen', $sub->kode_subkomponen)
+                                                    ->where('komponen', $komp->kode_komponen)
+                                                    ->where('ro', $ros->kode_ro)
+                                                    ->where('kro', $kros->kode_kro)
+                                                    ->where('kegiatan', $act->kode_act)
+                                                    ->where('program', $prog->kode_prog)
+                                                    ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
+                                                    ->sum('nilai');
+                                                    ## Realisasi sampai dengan bulan lalu
+
+                                                    ## Realisasi sampai dengan bulan ini
+                                                    $real_sub_curr[] = DB::table('view_trans_sp2d_akun')
+                                                    ->where('subkomponen', $sub->kode_subkomponen)
+                                                    ->where('komponen', $komp->kode_komponen)
+                                                    ->where('ro', $ros->kode_ro)
+                                                    ->where('kro', $kros->kode_kro)
+                                                    ->where('kegiatan', $act->kode_act)
+                                                    ->where('program', $prog->kode_prog)
+                                                    ->whereBetween('tanggal', [$first_day_month, $curr_month])
+                                                    ->sum('nilai');
+                                                    ## Realisasi sampai dengan bulan ini
+
+                                                    ## Realisasi total
+                                                    $real_sub_tott[] = DB::table('view_trans_sp2d_akun')
+                                                    ->where('subkomponen', $sub->kode_subkomponen)
+                                                    ->where('komponen', $komp->kode_komponen)
+                                                    ->where('ro', $ros->kode_ro)
+                                                    ->where('kro', $kros->kode_kro)
+                                                    ->where('kegiatan', $act->kode_act)
+                                                    ->where('program', $prog->kode_prog)
+                                                    ->whereBetween('tanggal', [$first_day, $curr_month])
+                                                    ->sum('nilai');
+                                                    ## Realisasi total
+                                                    }else{
+                                                        $real_sub_last[] = 0;
+                                                        $real_sub_curr[] = 0;
+                                                        $real_sub_tott[] = 0;
+                                                    }
+
+
+
+						                    	$pagu_subkomponen[] = DB::table('view_lkka_raw')
+								            				->where('id_sub', $sub->id_sub)
+								            				->orderBy('kode_subkomponen')
+								            				->sum('anggaran');
+                                                		            	
+						                    }
+								            ##pagu komponen
+
 	                                        	if (isset($sub->kode_subkomponen)) {
 	                                        		### AKUN
 	                                        		${'akun'.$i6} = DB::table('view_lkka_raw')->select('view_lkka_raw.kode_subkomponen','view_lkka_raw.id_sub','view_lkka_raw.akun','view_lkka_raw.anggaran','view_lkka_raw.sumber_dana','rjw_akun.uraian')->distinct()->leftjoin('rjw_akun','rjw_akun.akun','=','view_lkka_raw.akun')->where('id_sub', $sub->id_sub)->orderBy('akun')->get();
                                             		$akuns[] = ${'akun'.$i6};
 	                                        		### AKUN
 	                                        		foreach (${'akun'.$i6} as $akun) {
+
+
+                                                    if (isset($trans_sp2d_akun[0]->akun)) {
+                                                    ## Realisasi sampai dengan bulan lalu
+                                                    $real_akun_last[] = DB::table('view_trans_sp2d_akun')
+                                                    ->where('akun', $akun->akun)
+                                                    ->where('subkomponen', $sub->kode_subkomponen)
+                                                    ->where('komponen', $komp->kode_komponen)
+                                                    ->where('ro', $ros->kode_ro)
+                                                    ->where('kro', $kros->kode_kro)
+                                                    ->where('kegiatan', $act->kode_act)
+                                                    ->where('program', $prog->kode_prog)
+                                                    ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
+                                                    ->sum('nilai');
+                                                    ## Realisasi sampai dengan bulan lalu
+                                                    
+                                                    ## Realisasi sampai dengan bulan ini
+                                                    $real_akun_curr[] = DB::table('view_trans_sp2d_akun')
+                                                    ->where('akun', $akun->akun)
+                                                    ->where('subkomponen', $sub->kode_subkomponen)
+                                                    ->where('komponen', $komp->kode_komponen)
+                                                    ->where('ro', $ros->kode_ro)
+                                                    ->where('kro', $kros->kode_kro)
+                                                    ->where('kegiatan', $act->kode_act)
+                                                    ->where('program', $prog->kode_prog)
+                                                    ->whereBetween('tanggal', [$first_day_month, $curr_month])
+                                                    ->sum('nilai');
+                                                    ## Realisasi sampai dengan bulan ini
+
+                                                    ## Realisasi total
+                                                    $real_akun_tott[] = DB::table('view_trans_sp2d_akun')
+                                                    ->where('akun', $akun->akun)
+                                                    ->where('subkomponen', $sub->kode_subkomponen)
+                                                    ->where('komponen', $komp->kode_komponen)
+                                                    ->where('ro', $ros->kode_ro)
+                                                    ->where('kro', $kros->kode_kro)
+                                                    ->where('kegiatan', $act->kode_act)
+                                                    ->where('program', $prog->kode_prog)
+                                                    ->whereBetween('tanggal', [$first_day, $curr_month])
+                                                    ->sum('nilai');
+                                                    ## Realisasi total
+                                                    }else{ 
+                                                        $real_akun_last[] = 0;
+                                                        $real_akun_curr[] = 0;
+                                                        $real_akun_tott[] = 0;
+                                                    }
 
 
 
@@ -120,30 +452,35 @@ class MainLkkaController extends Controller
         $i++;
         } //endfor program
 
+      
+
       return view('pages.lkka', compact(
             'program',
                 'pagu_program',
-                // 'real_prog_last','real_prog_curr','real_prog_tott',
+                'real_prog_last','real_prog_curr','real_prog_tott',
             'aktivitas',
-                // 'pagu_aktivitas',
-                // 'real_act_last','real_act_curr','real_act_tott',
+                'pagu_aktivitas',
+                'real_act_last','real_act_curr','real_act_tott',
             'kro',
-                // 'pagu_kro',
-                // 'real_kro_last','real_kro_curr','real_kro_tott',
+                'pagu_kro',
+                'real_kro_last','real_kro_curr','real_kro_tott',
             'ro',
-                // 'pagu_ro',
+                'pagu_ro',
+                'real_ro_last','real_ro_curr','real_ro_tott',
             'komponen',
-                // 'pagu_komp',
+                'pagu_komponen',
+                'real_komp_last','real_komp_curr','real_komp_tott',
             'subkomponen',
-                // 'pagu_sub',
+                'pagu_subkomponen',
+                'real_sub_last','real_sub_curr','real_sub_tott',
             'akuns',
-                // 'real_akun_last','real_akun_curr','real_akun_tott'
+                'real_akun_last','real_akun_curr','real_akun_tott'
         ));
 
     }
 
 
-    
+
 
 
 

@@ -154,7 +154,7 @@ class MainController extends Controller
 
                                            // $realisasi
 
-                                            ${'akun'.$i6} = DB::table('view_lkka_raw')->select('view_lkka_raw.kode_subkomponen','view_lkka_raw.id_sub','view_lkka_raw.akun','view_lkka_raw.anggaran','view_lkka_raw.sumber_dana')->distinct()->where('id_sub', $akun->id_sub)->orderBy('akun')->get();
+                                            ${'akun'.$i6} = DB::table('view_lkka_raw')->select('view_lkka_raw.kode_subkomponen','view_lkka_raw.id_sub','view_lkka_raw.akun','view_lkka_raw.anggaran','view_lkka_raw.sumber_dana','rjw_akun.uraian')->distinct()->leftjoin('rjw_akun','rjw_akun.akun','=','view_lkka_raw.akun')->where('id_sub', $akun->id_sub)->orderBy('akun')->get();
                                             $akuns[] = ${'akun'.$i6};
 
                                             foreach (${'akun'.$i6} as $akun) {
@@ -191,7 +191,7 @@ class MainController extends Controller
 
         $i++;
         }
-
+        
         return view('pages.lkka', compact(
             'program',
                 'pagu_program','real_prog_last','real_prog_curr','real_prog_tott',
@@ -288,15 +288,24 @@ class MainController extends Controller
 
     public function sp2d_view(){
         
-        $table_sp2d = DB::table('rjw_trans_sp2d')->get();
+        $table_sp2d = DB::table('rjw_trans_sp2d')
+        ->orderBy('tgl_sp2d')
+        ->get();
         
         $i=0;
         foreach ($table_sp2d as $table) {
-            $nilai[] = DB::table('rjw_trans_sp2d_akun')->where('id_sp2d', $table_sp2d[$i]->id)->SUM('nilai');
+            $nilai[] = DB::table('rjw_trans_sp2d_akun')
+            ->where('id_sp2d', $table_sp2d[$i]->id)
+            ->SUM('nilai');
+
+            $valid[] = DB::table('view_trans_sp2d_akun')
+            ->where('id_sp2d', $table_sp2d[$i]->id)
+            ->get();
+
            $i++;
         }
 
-        return view('pages.sp2d', compact('table_sp2d','nilai'));
+        return view('pages.sp2d', compact('table_sp2d','nilai','valid'));
     }
 
     public function sp2d_store(Request $request){
@@ -332,13 +341,74 @@ class MainController extends Controller
             'nilai' => $request->nilai
         ]);
 
+        // $view_trans_sp2d_akun = DB::table('view_trans_sp2d_akun')
+        // ->where('id_sp2d', $request->id)
+        // ->where('akun', $request->akun)
+        // ->get();
+        // ## dd($view_trans_sp2d_akun);
+
+        // ##jika program aktivitas kro == komponen gaji 
+        // $set_gaji = DB::table('rjw_set_gaji')->get();
+        // $program = $set_gaji[0]->program;
+        // $aktivitas = $set_gaji[0]->aktivitas;
+        // $kro = $set_gaji[0]->kro;
+        // $ro = $set_gaji[0]->ro;
+        // $komponen = $set_gaji[0]->komponen;
+        // $subkomponen = $set_gaji[0]->subkomponen;
+
+        // if ($view_trans_sp2d_akun[0]->program == $program &&
+        //     $view_trans_sp2d_akun[0]->kegiatan == $aktivitas &&
+        //     $view_trans_sp2d_akun[0]->kro == $kro) {
+            
+        //     $table_akun_add = DB::table('rjw_trans_sp2d_akun_add')->insert([
+        //         'id_sp2d' => $request->id,
+        //         'ro' => $ro,
+        //         'komponen' => $komponen, 
+        //         'subkomponen' => $subkomponen
+        //     ]);
+        // }
+        
         return redirect()->route('sp2d.detail', $request->id);
     }
 
+    public function sp2d_akun_edit(Request $request){
+       
+        $table_akun = DB::table('rjw_trans_sp2d_akun')
+            ->where('id', $request->id)->update([
+            'akun' => $request->akun,
+            'program' => $request->program,
+            'output' => $request->output,
+            'sumber_dana' => $request->sumber_dana,
+            'nilai' => $request->nilai
+        ]);       
+        
+        return redirect()->route('sp2d.detail', $request->id_sp2d);
+    }
+
+    public function sp2d_akun_destroy(Request $request){
+
+        $sp2d = DB::table('rjw_trans_sp2d_akun')->where('id', $request->id)->get();
+        DB::table('rjw_trans_sp2d_akun')->where('id', $request->id)->delete();
+        
+            $id_sp2d = $sp2d[0]->id_sp2d;            
+
+        return redirect()->route('sp2d.detail.delete-btn', $id_sp2d);
+    }
+
     public function sp2d_view_detail(Request $request){
-        $table_sp2d_akun = DB::table('rjw_trans_sp2d_akun')->where('id_sp2d', $request->id)->get();
-        $table_sp2d = DB::table('rjw_trans_sp2d')->where('id',$request->id)->get();
-        $total_akun = DB::table('rjw_trans_sp2d_akun')->select(DB::raw('SUM(nilai) AS total_akun'))->where('id_sp2d', $request->id)->get();
+        $table_sp2d_akun = DB::table('rjw_trans_sp2d_akun')
+                        ->select('rjw_trans_sp2d_akun.*','rjw_akun.uraian','rjw_trans_sp2d_akun_add.ro','rjw_trans_sp2d_akun_add.komponen','rjw_trans_sp2d_akun_add.subkomponen')
+                        ->leftjoin('rjw_akun','rjw_akun.akun','=','rjw_trans_sp2d_akun.akun')
+                        ->leftjoin('rjw_trans_sp2d_akun_add','rjw_trans_sp2d_akun_add.id_sp2d_akun','=','rjw_trans_sp2d_akun.id')
+                        ->where('id_sp2d', $request->id)
+                        ->get();
+        $table_sp2d = DB::table('rjw_trans_sp2d')
+                        ->where('id',$request->id)
+                        ->get();
+        $total_akun = DB::table('rjw_trans_sp2d_akun')
+                        ->select(DB::raw('SUM(nilai) AS total_akun'))
+                        ->where('id_sp2d', $request->id)
+                        ->get();
         
         return view('pages.sp2d-detail', compact('table_sp2d','table_sp2d_akun','total_akun'));
     }
