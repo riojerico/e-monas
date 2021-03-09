@@ -138,7 +138,7 @@
                                 <a href="{{ route('lkka_komponen', $ros->id_ro) }}">
                                 <font color="black">
                                 <b>&nbsp;&nbsp;&nbsp;
-                                  {{ $ros->kode_ro.' '.$ros->ro }}
+                                  {!! $ros->kode_ro.' '.$ros->ro !!}
                                 </b>
                                 </font>
                                 </a>

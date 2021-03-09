@@ -6,6 +6,7 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\LkkaController;
 use App\Http\Controllers\MainLkkaController;
 use App\Http\Controllers\MainSp2dController;
+use App\Http\Controllers\HomepageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +23,7 @@ Route::group(['middleware' => 'auth'], function () {
    	//Route::auth();
 
     Route::get('/', 
-    	[MainController::class, 'dashboard'])
+    	[HomepageController::class, 'index'])
     ->name('dashboard');
 
     ######### SP2D #############

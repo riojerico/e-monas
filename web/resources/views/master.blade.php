@@ -21,6 +21,8 @@
     </div>
     @stack('ajax_crud')
   @include('layouts._script-js')
+  
+  @stack('js-pages')
 
 </body>
 </html> 

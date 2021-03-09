@@ -65,7 +65,7 @@
         var salesChart = new Chart(salesChartCanvas, {
           type: 'line',
           data: {
-            labels: ["2am", "4am", "6am", "8am", "10am", "12am"],
+            labels: ["Jan", "Feb", "Mar", "Apr", "10am", "12am"],
             datasets: [{
                 data: [80, 115, 115, 150, 130, 160],
                 backgroundColor: gradient1,

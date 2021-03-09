@@ -55,6 +55,7 @@ class MainLkkaController extends Controller
             ## Realisasi sampai dengan bulan lalu
             $real_prog_last[] = DB::table('view_trans_sp2d_akun')
                                 ->where('program', $prog->kode_prog)
+                                ->where('ro','<>',null)
                                 ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
                                 ->sum('nilai');
             
@@ -63,6 +64,7 @@ class MainLkkaController extends Controller
             ## Realisasi sampai dengan bulan ini
             $real_prog_curr[] = DB::table('view_trans_sp2d_akun')
                                 ->where('program', $prog->kode_prog)
+                                ->where('ro','<>',null)
                                 ->whereBetween('tanggal', [$first_day_month, $curr_month])
                                 ->sum('nilai');
             ## Realisasi sampai dengan bulan ini
@@ -70,6 +72,7 @@ class MainLkkaController extends Controller
             ## Realisasi total
             $real_prog_tott[] = DB::table('view_trans_sp2d_akun')
                                 ->where('program', $prog->kode_prog)
+                                ->where('ro','<>',null)
                                 ->whereBetween('tanggal', [$first_day, $curr_month])
                                 ->sum('nilai');
             ## Realisasi total
@@ -101,6 +104,7 @@ class MainLkkaController extends Controller
                     $real_act_last[] = DB::table('view_trans_sp2d_akun')
                     ->where('kegiatan', $act->kode_act)
                     ->where('program', $prog->kode_prog)
+                    ->where('ro','<>',null)
                     ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
                     ->sum('nilai');
                     ## Realisasi sampai dengan bulan lalu
@@ -109,6 +113,7 @@ class MainLkkaController extends Controller
                     $real_act_curr[] = DB::table('view_trans_sp2d_akun')
                     ->where('kegiatan', $act->kode_act)
                     ->where('program', $prog->kode_prog)
+                    ->where('ro','<>',null)
                     ->whereBetween('tanggal', [$first_day_month, $curr_month])
                     ->sum('nilai');
                     ## Realisasi sampai dengan bulan ini
@@ -117,6 +122,7 @@ class MainLkkaController extends Controller
                     $real_act_tott[] = DB::table('view_trans_sp2d_akun')
                     ->where('kegiatan', $act->kode_act)
                     ->where('program', $prog->kode_prog)
+                    ->where('ro','<>',null)
                     ->whereBetween('tanggal', [$first_day, $curr_month])
                     ->sum('nilai');
                     ## Realisasi total
@@ -154,6 +160,7 @@ class MainLkkaController extends Controller
                         ->where('kro', $kros->kode_kro)
                         ->where('kegiatan', $act->kode_act)
                         ->where('program', $prog->kode_prog)
+                        ->where('ro','<>',null)
                         ->whereBetween('tanggal', [$first_day, $res_lastdate_prevmonth])
                         ->sum('nilai');
                         ## Realisasi sampai dengan bulan lalu
@@ -163,6 +170,7 @@ class MainLkkaController extends Controller
                         ->where('kro', $kros->kode_kro)
                         ->where('kegiatan', $act->kode_act)
                         ->where('program', $prog->kode_prog)
+                        ->where('ro','<>',null)
                         ->whereBetween('tanggal', [$first_day_month, $curr_month])
                         ->sum('nilai');
                         ## Realisasi sampai dengan bulan ini
@@ -172,6 +180,7 @@ class MainLkkaController extends Controller
                         ->where('kro', $kros->kode_kro)
                         ->where('kegiatan', $act->kode_act)
                         ->where('program', $prog->kode_prog)
+                        ->where('ro','<>',null)
                         ->whereBetween('tanggal', [$first_day, $curr_month])
                         ->sum('nilai');
                         ## Realisasi total

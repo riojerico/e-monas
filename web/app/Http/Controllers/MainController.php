@@ -14,14 +14,7 @@ class MainController extends Controller
 
     public function __construct(){
      
-    }
-
-    public function dashboard(){
-        $users = Auth::user();
-        
-        
-        return view('pages.home');
-    }   
+    } 
 
     public function lkka_view(){
         $program = DB::table('view_lkka_raw')
@@ -289,7 +282,7 @@ class MainController extends Controller
     public function sp2d_view(){
         
         $table_sp2d = DB::table('rjw_trans_sp2d')
-        ->orderBy('tgl_sp2d')
+        ->orderBy('tgl_sp2d','desc')
         ->get();
         
         $i=0;

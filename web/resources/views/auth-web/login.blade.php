@@ -36,7 +36,7 @@
               Sign up
             </button>
           </div>
-          <img src="{!! asset('assets-login/img/log.svg') !!}" class="image" alt="" />
+          <img src="{!! asset('assets-login/img/log-atrbpn.svg') !!}" class="image" alt="" />
         </div>
         <div class="panel right-panel">
           <div class="content">
@@ -48,7 +48,7 @@
               Sign in
             </button>
           </div>
-          <img src="{!! asset('assets-login/img/register.svg') !!}" class="image" alt="" />
+          <img src="{!! asset('assets-login/img/register-atrbpn2.svg') !!}" class="image" alt="" />
         </div>
       </div>
     </div>
