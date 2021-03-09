@@ -6,7 +6,10 @@
 
 
       <div class="mdc-drawer__header">
+
         <a href="{{ route('dashboard') }}" class="brand-logo">
+          <img src="{{ asset('assets-admin/images/favicon.png') }}" width="40%">
+          <br>
           <font color="white"><B>e-MONAS</B>
           <br>
           Monitoring Anggaran Satker</font>
