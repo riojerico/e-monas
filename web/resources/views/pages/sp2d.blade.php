@@ -125,17 +125,8 @@ var btn = document.getElementById("myBtn");
                     <td>{{ $list_sp2d->nomor_sp2d }}</td>
                     <td>{{ $list_sp2d->tgl_sp2d }}</td>
                     <td class="text-right">
-                      @if($nilai[$loop->index] == 0)
-                        <a href="{{ route('sp2d.detail',$list_sp2d->id) }}" 
-                          data-toggle="tooltip" title="detail akun perlu diisi, sesuaikan dengan data dari aplikasi SPAN!">
-                        <font color="red">
-                          ({{ number_format($nilai[$loop->index]) }}) belum di entry
-                        </font>
-                        </a>
-                        @else
+
                         {{ number_format($nilai[$loop->index]) }}
-                      @endif
-                      
 
                     </td>
                     <td>{{ $list_sp2d->nomor_invoice }}</td>
@@ -155,10 +146,17 @@ var btn = document.getElementById("myBtn");
                         @endforeach
 
                         @if($not_valid == 1)
-                          <a href="{{ route('sp2d.detail',$list_sp2d->id) }}" 
+                          @if($list_sp2d->jenis_spm == 'UP' || $list_sp2d->jenis_spm == 'TUP')
+                            <a href="{{ route('sp2d.detail',$list_sp2d->id) }}" data-toogle="tooltip" title="Validasi RO, Komponen, Subkomponen">
+                            <font color="green"><span class="material-icons">check_circle</span></font>
+                            </a>
+                          @else
+                            <a href="{{ route('sp2d.detail',$list_sp2d->id) }}" 
                             data-toogle="tooltip" title="Validasi RO, Komponen, Subkomponen">
                             <font color="orange"><span class="material-icons">info</span></font>
-                          </a>
+                            </a>
+                          @endif
+                          
                         @else
                           <a href="{{ route('sp2d.detail',$list_sp2d->id) }}" data-toogle="tooltip" title="Validasi RO, Komponen, Subkomponen">
                             <font color="green"><span class="material-icons">check_circle</span></font>

@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>IT TEAM Kantor Pertanahan Kab. Boalemo</title>
   @include('layouts._script-css')
+  @stack('css-pages')
 </head>
 <body>
 <script src="{{ asset('assets-admin/js/preloader.js') }}"></script>

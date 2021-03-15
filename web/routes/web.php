@@ -7,6 +7,7 @@ use App\Http\Controllers\LkkaController;
 use App\Http\Controllers\MainLkkaController;
 use App\Http\Controllers\MainSp2dController;
 use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\LaporanMonevController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 	######### SP2D #############
+
 
 	######### LKKA #############
 
@@ -127,6 +129,14 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('/lkka-detail-akun/{id}/destroy', [MainController::class, 'lkka_akun_destroy'])->name('lkka_akun_destroy');
 
 	####### AKUN #####
+
+	####### Laporan Monev #####
+
+	Route::get('/laporan/monev', [LaporanMonevController::class, 'index'])->name('lap.monev');
+
+
+	####### Laporan Monev #####
+
 	
 
 	Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);
