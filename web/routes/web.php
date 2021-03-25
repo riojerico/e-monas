@@ -8,6 +8,7 @@ use App\Http\Controllers\MainLkkaController;
 use App\Http\Controllers\MainSp2dController;
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\LaporanMonevController;
+use App\Http\Controllers\RealisasiFisikController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,9 @@ use App\Http\Controllers\LaporanMonevController;
 
 Route::group(['middleware' => 'auth'], function () {
    	//Route::auth();
+
+	Route::post('/realisasi/fisik/store', [RealisasiFisikController::class, 'store'])->name('realisasi.fisik.store');
+
 
     Route::get('/', 
     	[HomepageController::class, 'index'])
@@ -134,9 +138,13 @@ Route::group(['middleware' => 'auth'], function () {
 
 	Route::get('/laporan/monev', [LaporanMonevController::class, 'index'])->name('lap.monev');
 
-
 	####### Laporan Monev #####
 
+	####### Realisasi Fisik #####
+
+	Route::get('/realisasi/fisik', [RealisasiFisikController::class, 'index'])->name('realisasi.fisik');
+
+	####### Realisasi Fisik #####
 	
 
 	Route::get('/logout', [AuthenticatedSessionController::class, 'destroy']);

@@ -11,48 +11,6 @@ use Auth;
 class MainController extends Controller
 {
 
-
-    public function __construct(){
-     
-    } 
-
-    public function lkka_detail_aktivitas(Request $request){
-        // $subkomp = DB::table('rjw_subkomponen')->where('id', $request->id)->get();
-        // $akun = DB::table('rjw_detil')->select('rjw_detil.*','rjw_akun.uraian')->where('id_subkomponen', $request->id)->join('rjw_akun','rjw_akun.akun','=','rjw_detil.akun')->get();
-        // //dd($subkomp);
-        // return view('pages.lkka-detail-akun', compact('subkomp','akun'));
-    }
-
-    public function lkka_detail_kro(Request $request){
-        // $subkomp = DB::table('rjw_subkomponen')->where('id', $request->id)->get();
-        // $akun = DB::table('rjw_detil')->select('rjw_detil.*','rjw_akun.uraian')->where('id_subkomponen', $request->id)->join('rjw_akun','rjw_akun.akun','=','rjw_detil.akun')->get();
-        // //dd($subkomp);
-        // return view('pages.lkka-detail-akun', compact('subkomp','akun'));
-    }
-
-    public function lkka_detail_ro(Request $request){
-        // $subkomp = DB::table('rjw_subkomponen')->where('id', $request->id)->get();
-        // $akun = DB::table('rjw_detil')->select('rjw_detil.*','rjw_akun.uraian')->where('id_subkomponen', $request->id)->join('rjw_akun','rjw_akun.akun','=','rjw_detil.akun')->get();
-        // //dd($subkomp);
-        // return view('pages.lkka-detail-akun', compact('subkomp','akun'));
-    }
-
-    public function lkka_detail_komponen(Request $request){
-        // $subkomp = DB::table('rjw_subkomponen')->where('id', $request->id)->get();
-        // $akun = DB::table('rjw_detil')->select('rjw_detil.*','rjw_akun.uraian')->where('id_subkomponen', $request->id)->join('rjw_akun','rjw_akun.akun','=','rjw_detil.akun')->get();
-        // //dd($subkomp);
-        // return view('pages.lkka-detail-akun', compact('subkomp','akun'));
-    }
-
-    public function lkka_detail_subkomponen(Request $request){
-        // $subkomp = DB::table('rjw_subkomponen')->where('id', $request->id)->get();
-        // $akun = DB::table('rjw_detil')->select('rjw_detil.*','rjw_akun.uraian')->where('id_subkomponen', $request->id)->join('rjw_akun','rjw_akun.akun','=','rjw_detil.akun')->get();
-        // //dd($subkomp);
-        // return view('pages.lkka-detail-akun', compact('subkomp','akun'));
-    }
-
-
-
     public function lkka_detail_akun(Request $request){
         $subkomp = DB::table('rjw_subkomponen')->where('id', $request->id)->get();
         $akun = DB::table('rjw_detil')->select('rjw_detil.*','rjw_akun.uraian')->where('id_subkomponen', $request->id)->leftjoin('rjw_akun','rjw_akun.akun','=','rjw_detil.akun')->get();
@@ -147,33 +105,6 @@ class MainController extends Controller
             'nilai' => $request->nilai
         ]);
 
-        // $view_trans_sp2d_akun = DB::table('view_trans_sp2d_akun')
-        // ->where('id_sp2d', $request->id)
-        // ->where('akun', $request->akun)
-        // ->get();
-        // ## dd($view_trans_sp2d_akun);
-
-        // ##jika program aktivitas kro == komponen gaji 
-        // $set_gaji = DB::table('rjw_set_gaji')->get();
-        // $program = $set_gaji[0]->program;
-        // $aktivitas = $set_gaji[0]->aktivitas;
-        // $kro = $set_gaji[0]->kro;
-        // $ro = $set_gaji[0]->ro;
-        // $komponen = $set_gaji[0]->komponen;
-        // $subkomponen = $set_gaji[0]->subkomponen;
-
-        // if ($view_trans_sp2d_akun[0]->program == $program &&
-        //     $view_trans_sp2d_akun[0]->kegiatan == $aktivitas &&
-        //     $view_trans_sp2d_akun[0]->kro == $kro) {
-            
-        //     $table_akun_add = DB::table('rjw_trans_sp2d_akun_add')->insert([
-        //         'id_sp2d' => $request->id,
-        //         'ro' => $ro,
-        //         'komponen' => $komponen, 
-        //         'subkomponen' => $subkomponen
-        //     ]);
-        // }
-        
         return redirect()->route('sp2d.detail', $request->id);
     }
 

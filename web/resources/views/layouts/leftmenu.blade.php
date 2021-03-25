@@ -36,6 +36,12 @@
               </a>
             </div>
             <div class="mdc-list-item mdc-drawer-item">
+              <a class="mdc-drawer-link" href="{{ route('realisasi.fisik') }}">
+                <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">description</i>
+                Realisasi Fisik
+              </a>
+            </div>
+            <div class="mdc-list-item mdc-drawer-item">
               <a class="mdc-drawer-link" href="{{ route('lkka') }}">
                 <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">grid_on</i>
                 LKKA
