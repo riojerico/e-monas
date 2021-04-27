@@ -272,7 +272,7 @@
                             $persen_subkomp = ${'real_subkomponen_'.$get_sd.$data->kode_act.$data_kro->kode_kro.$data_ro->kode_ro.$data_komponen->kode_komponen.$data_subkomp->kode_subkomponen}[$get_sd] / max(${'anggaran_subkomponen_'.$get_sd.$data->kode_act.$data_kro->kode_kro.$data_ro->kode_ro.$data_komponen->kode_komponen.$data_subkomp->kode_subkomponen}[$get_sd], 1) * 100;
                           
                           }else{
-                            $persen_subkomp = 1;
+                            $persen_subkomp = 0;
                           }
                         ?>
 
