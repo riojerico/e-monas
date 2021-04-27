@@ -7,6 +7,7 @@ use DB;
 
 class LaporanMonevController extends Controller
 {
+    
     public function index(){
 
         $curr_year = date("Y");
@@ -15,133 +16,251 @@ class LaporanMonevController extends Controller
         $curr_month = date('Y-m-d');
         $prev_month = date('Y-m',strtotime("-1 month"));
 
-    	$list_aktivitas = DB::table('view_lkka_raw')
-    				->select('kode_act','nama_aktivitas')
-    				->groupBy('kode_act')
-    				->orderBy('kode_act')
-    				->get();
-    	
-    	$i=0;
-    	$i2=0;
-    	$i3=0;
+        $list_aktivitas = DB::table('view_lkka_raw')
+                    ->select('kode_act','nama_aktivitas')
+                    ->groupBy('kode_act')
+                    ->orderBy('kode_act')
+                    ->get();
+
+        $loop_sumber_dana = DB::table('view_lkka_raw')
+                        ->select('sumber_dana')
+                        ->where('id_kodesatker',1)
+                        ->groupBy('sumber_dana')
+                        ->orderBy('sumber_dana','desc')
+                        ->get();
+        $count_loop_sd = count($loop_sumber_dana);
+        
+        $i0=0;
+        $i=0;
+        $i2=0;
+        $i3=0;
         $i4=0;
         $i0=0;
 
-        $sumber_dana = DB::table('view_lkka_raw')
-                        ->select('sumber_dana')
-                        ->groupBy('sumber_dana')
-                        ->orderBy('sumber_dana','desc')
-                        ->get(); 
+        foreach ($list_aktivitas as $act) {
 
-        foreach ($sumber_dana as $sd) {
-            //$s_d[] = 
-            //echo $sd->sumber_dana; 
-            //echo "string";
-        $i0++;                    
-        }        
+             
 
-
-        	foreach ($list_aktivitas as $act) {
-
-
-        		${'list_kro_rm'.$i} = DB::table('view_lkka_raw')
-        				->select('kode_kro','kro','kode_ro','ro')
-        				->where('kode_act', $act->kode_act)
-        				->where('sumber_dana','RM')
-        				->groupBy('kode_ro')
-        				->get();
-        		$list_kro_rm[] = ${'list_kro_rm'.$i};
-
-        		foreach (${'list_kro_rm'.$i} as $kro) {
-
-                    $anggaran_ro_rm[] = DB::table('view_lkka_raw')
-                                    ->where('kode_kro', $kro->kode_kro)
-                                    ->where('kode_ro', $kro->kode_ro)
-                                    ->where('sumber_dana','RM')
-                                    ->groupBy('kode_ro')
-                                    ->sum('anggaran');
-
-                    $real_ro_last_rm[] = DB::table('view_trans_sp2d_akun')
-                                    ->where('kegiatan', $act->kode_act)
-                                    ->where('ro', $kro->kode_ro)
-                                    ->where('ro','<>',null)
-                                    ->where('sumber_dana','A') 
-                                    ->whereBetween('tanggal', [$first_day, $curr_month])
-                                    ->sum('nilai');
+            for ($i_sd=0; $i_sd < $count_loop_sd ; $i_sd++) { 
                     
+                ${'sum_anggaran'.$i_sd.$act->kode_act}[$i_sd] = DB::table('view_lkka_raw')
+                            ->where('kode_act', $act->kode_act)
+                            ->where('id_kodesatker',1)
+                            ->where('sumber_dana', $loop_sumber_dana[$i_sd]->sumber_dana)
+                            ->sum('anggaran');
 
-        			${'list_komponen_rm'.$i2} = DB::table('view_lkka_raw')
-        				->select('kode_komponen','komponen')
-        				->where('kode_kro', $kro->kode_kro)
-                        ->where('kode_ro', $kro->kode_ro)
-        				->where('sumber_dana','RM')
-        				->groupBy('kode_komponen')
-        				->get();
+                $sum_anggaran[] = 'sum_anggaran'.$i_sd.$act->kode_act;
 
-    	    		$list_komponen_rm[] = ${'list_komponen_rm'.$i2};
+                if ($loop_sumber_dana[$i_sd]->sumber_dana == 'RM') {
+                    $kode_sd = 'A';                    
+                }elseif ($loop_sumber_dana[$i_sd]->sumber_dana == 'PNBP') {
+                    $kode_sd = 'D';                    
+                }
 
-    	    		foreach (${'list_komponen_rm'.$i2} as $komponen) {
+                ${'sum_realisasi_anggaran'.$i_sd.$act->kode_act}[$i_sd] = DB::table('view_trans_sp2d_akun')
+                            ->where('kegiatan', $act->kode_act)
+                            ->where('id_kd_satker',1) 
+                            ->where('ro','<>',null)
+                            ->where('sumber_dana', $kode_sd) 
+                            ->whereBetween('tanggal', [$first_day, $curr_month])
+                            ->sum('nilai');
 
-                        $anggaran_komponen_rm[] = DB::table('view_lkka_raw')
-                                    ->where('kode_komponen', $komponen->kode_komponen)
+                $sum_realisasi_anggaran[] = 'sum_realisasi_anggaran'.$i_sd.$act->kode_act;
+
+                ${'list_kro'.$i_sd.$act->kode_act}[$i_sd] = DB::table('view_lkka_raw')
+                        ->select('kode_kro','kro','kode_ro','ro')
+                        ->where('kode_act', $act->kode_act)
+                        ->where('sumber_dana',$loop_sumber_dana[$i_sd]->sumber_dana)
+                        ->groupBy('kode_kro')
+                        ->get();
+                $list_kro[] = 'list_kro'.$i_sd.$act->kode_act;
+
+                foreach (${'list_kro'.$i_sd.$act->kode_act}[$i_sd] as $kro) {
+
+
+                    ##
+                    ${'list_ro'.$i_sd.$act->kode_act.$kro->kode_kro}[$i_sd] = DB::table('view_lkka_raw')
+                            ->where('kode_act', $act->kode_act)
+                            ->where('kode_kro', $kro->kode_kro)
+                            ->where('sumber_dana',$loop_sumber_dana[$i_sd]->sumber_dana)
+                            ->groupBy('kode_ro')
+                            ->get();
+
+                    $list_ro[] = 'list_ro'.$i_sd.$act->kode_act.$kro->kode_kro;
+
+                    foreach (${'list_ro'.$i_sd.$act->kode_act.$kro->kode_kro}[$i_sd] as $ros) {
+                        
+                        ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd] = DB::table('view_realisasi_fisik')
+                                    ->where('kode_keg', $act->kode_act)
                                     ->where('kode_kro', $kro->kode_kro)
-                                    ->where('kode_ro', $kro->kode_ro)
-                                    ->where('sumber_dana','RM')
-                                    ->groupBy('kode_komponen')
-                                    ->sum('anggaran');
+                                    ->where('kode_ro', $ros->kode_ro)
+                                    ->get();
 
-                        $real_komponen_last_rm[] = DB::table('view_trans_sp2d_akun')
-                                    ->where('kegiatan', $act->kode_act)
-                                    ->where('ro', $kro->kode_ro)
-                                    ->where('komponen', $komponen->kode_komponen)
-                                    ->where('ro','<>',null)
-                                    ->where('sumber_dana','A') 
-                                    ->whereBetween('tanggal', [$first_day, $curr_month])
-                                    ->sum('nilai');
+                        $volume[] = 'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro;
 
-    	    			${'list_subkomponen_rm'.$i3} = DB::table('view_lkka_raw')
-                    				->select('kode_subkomponen','subkomponen','id_sub')
-                    				->where('kode_komponen', $komponen->kode_komponen)
-                                    ->where('kode_kro', $kro->kode_kro)
-                                    ->where('kode_ro', $kro->kode_ro)
-                    				->where('sumber_dana','RM')
-                    				->groupBy('kode_subkomponen')
-                    				->get();
-    	    			$list_subkomponen_rm[] = ${'list_subkomponen_rm'.$i3};
-
-                        foreach (${'list_subkomponen_rm'.$i3} as $subkomponen) {
-                            $anggaran_subkomponen_rm[] = DB::table('view_lkka_raw')
-                                    ->where('id_sub', $subkomponen->id_sub)
-                                    ->orderBy('kode_subkomponen')
-                                    ->sum('anggaran');
-
-                            $real_subkomponen_last_rm[] = DB::table('view_trans_sp2d_akun')
-                                    ->where('kegiatan', $act->kode_act)
-                                    ->where('kro', $kro->kode_kro)
-                                    ->where('ro', $kro->kode_ro)
-                                    ->where('komponen', $komponen->kode_komponen)
-                                    ->where('subkomponen', $subkomponen->kode_subkomponen)
-                                    ->where('ro','<>',null)
-                                    ->where('sumber_dana','A') 
-                                    ->whereBetween('tanggal', [$first_day, $curr_month])
-                                    ->sum('nilai');
-                        $i4++;
+                        if (${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->satuan == 'Layanan' || ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->satuan == 'layanan' ) {
+                            ${'realisasi_fisik'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro} =  
+                             (${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->jan+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->feb+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->mar+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->apr+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->mei+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->jun+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->jul+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->ags+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->sep+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->okt+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->nov+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->des)/12;
+                             $realisasi_fisik[] = 'realisasi_fisik'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro;
+                        }else{
+                            ${'realisasi_fisik'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro} =  
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->jan+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->feb+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->mar+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->apr+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->mei+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->jun+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->jul+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->ags+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->sep+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->okt+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->nov+
+                             ${'volume_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd][0]->des;
+                             $realisasi_fisik[] = 'realisasi_fisik'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro;
                         }
-    	    		$i3++;
-    	    		}
-    	    	$i2++;
-    	    	}
 
-        	$i++;
-    	}
-    	
-    	 //dd($real_ro_last_rm);
+                        ${'realisasi_ro_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd] = DB::table('view_trans_sp2d_akun')
+                                            ->where('kegiatan', $act->kode_act)
+                                            ->where('kro', $kro->kode_kro)
+                                            ->where('ro', $ros->kode_ro)
+                                            ->where('ro','<>',null)
+                                            ->where('sumber_dana',$kode_sd) 
+                                            ->whereBetween('tanggal', [$first_day, $curr_month])
+                                            ->sum('nilai');
+                        $realisasi_ro[] = 'realisasi_ro_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro;
 
-    	return view('pages.laporan.monev', 
-    		compact('list_aktivitas','list_kro_rm','list_komponen_rm','list_subkomponen_rm'
-                ,'anggaran_ro_rm','anggaran_komponen_rm','anggaran_subkomponen_rm'
-                ,'real_ro_last_rm','real_komponen_last_rm','real_subkomponen_last_rm'
+                        ${'anggaran_ro'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd] = DB::table('view_lkka_raw')
+                                        ->where('kode_kro', $kro->kode_kro)
+                                        ->where('kode_ro', $ros->kode_ro)
+                                        ->where('sumber_dana', $loop_sumber_dana[$i_sd]->sumber_dana)
+                                        ->groupBy('kode_ro')
+                                        ->sum('anggaran');
+                        $anggaran_ro[] = 'anggaran_ro'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro;
+
+                         
+                        ${'list_komponen'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd] = DB::table('view_lkka_raw')
+                            ->select('kode_komponen','komponen')
+                            ->where('kode_kro', $kro->kode_kro)
+                            ->where('kode_ro', $ros->kode_ro)
+                            ->where('sumber_dana',$loop_sumber_dana[$i_sd]->sumber_dana)
+                            ->groupBy('kode_komponen')
+                            ->get();
+
+                        $list_komponen[] = 'list_komponen'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro;
+
+
+                        foreach (${'list_komponen'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro}[$i_sd] as $komponen) {
+
+                            ${'anggaran_komponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen}[$i_sd] = DB::table('view_lkka_raw')
+                                            ->where('kode_komponen', $komponen->kode_komponen)
+                                            ->where('kode_kro', $kro->kode_kro)
+                                            ->where('kode_ro', $ros->kode_ro)
+                                            ->where('sumber_dana',$loop_sumber_dana[$i_sd]->sumber_dana)
+                                            ->groupBy('kode_komponen')
+                                            ->sum('anggaran');
+                                            
+                            $anggaran_komponen[] = 'anggaran_komponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen;
+
+                            ${'realisasi_ang_komponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen}[$i_sd] = DB::table('view_trans_sp2d_akun')
+                                            ->where('kegiatan', $act->kode_act)
+                                            ->where('kro', $kro->kode_kro)
+                                            ->where('ro', $ros->kode_ro)
+                                            ->where('komponen', $komponen->kode_komponen)
+                                            ->where('ro','<>',null)
+                                            ->where('sumber_dana', $kode_sd) 
+                                            ->whereBetween('tanggal', [$first_day, $curr_month])
+                                            ->sum('nilai');
+
+                            $realisasi_ang_komponen[] = 'realisasi_ang_komponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen;
+
+                            ${'list_subkomponen'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen}[$i_sd] = DB::table('view_lkka_raw')
+                                            ->select('kode_subkomponen','subkomponen','id_sub')
+                                            ->where('kode_komponen', $komponen->kode_komponen)
+                                            ->where('kode_kro', $kro->kode_kro)
+                                            ->where('kode_ro', $ros->kode_ro)
+                                            ->where('sumber_dana',$loop_sumber_dana[$i_sd]->sumber_dana)
+                                            ->groupBy('kode_subkomponen')
+                                            ->get();
+
+                            $list_subkomponen[] = 'list_subkomponen'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen;
+
+                            foreach (${'list_subkomponen'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen}[$i_sd] as $subkomponen) {
+                               
+                                    ${'anggaran_subkomponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen.$subkomponen->kode_subkomponen}[$i_sd] = DB::table('view_lkka_raw')
+                                            ->where('id_sub', $subkomponen->id_sub)
+                                            ->where('kode_komponen', $komponen->kode_komponen)
+                                            ->where('kode_kro', $kro->kode_kro)
+                                            ->where('kode_ro', $ros->kode_ro)
+                                            ->where('sumber_dana',$loop_sumber_dana[$i_sd]->sumber_dana)
+                                            ->orderBy('kode_subkomponen')
+                                            ->sum('anggaran');
+
+                                    $anggaran_subkomponen[] = 'anggaran_subkomponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen.$subkomponen->kode_subkomponen;
+
+                                    ${'real_subkomponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen.$subkomponen->kode_subkomponen}[$i_sd] = DB::table('view_trans_sp2d_akun')
+                                            ->where('kegiatan', $act->kode_act)
+                                            ->where('kro', $kro->kode_kro)
+                                            ->where('ro', $kro->kode_ro)
+                                            ->where('komponen', $komponen->kode_komponen)
+                                            ->where('subkomponen', $subkomponen->kode_subkomponen)
+                                            ->where('ro','<>',null)
+                                            ->where('sumber_dana', $kode_sd) 
+                                            ->whereBetween('tanggal', [$first_day, $curr_month])
+                                            ->sum('nilai');
+
+                                    $real_subkomponen[] = 'real_subkomponen_'.$i_sd.$act->kode_act.$kro->kode_kro.$ros->kode_ro.$komponen->kode_komponen.$subkomponen->kode_subkomponen;
+                            }
+                            /** endfor Sub Komponen **/
+
+                        } 
+                        /** endfor Komponen **/
+
+                    }
+                    /** endfor ro **/
+                    ##
+
+                    
+                $i2++;
+                }
+                /** endfor KRO **/
+            }
+            /** endfor Sumber Dana **/
+
+                                   
+            
+            $i++;
+        }
+        //endfor Aktivitas
+
+        // dd($list_subkomponen15527EAB002051);
+        // dd($realisasi_fisik05527EAA001);
+           // dd($list_subkomponen);
+
+            
+        //die();
+         // dd($real_subkomponen);
+
+        return view('pages.laporan.monev', 
+            compact('list_aktivitas','loop_sumber_dana'
+                 ,$sum_anggaran, $sum_realisasi_anggaran
+                 ,$list_kro
+                 ,$list_ro, $volume, $realisasi_fisik
+                 ,$realisasi_ro, $anggaran_ro
+                 ,$list_komponen, $anggaran_komponen, $realisasi_ang_komponen
+                 ,$list_subkomponen, $anggaran_subkomponen, $real_subkomponen
+                 
                 )
-    	);
+        );
     }
 }

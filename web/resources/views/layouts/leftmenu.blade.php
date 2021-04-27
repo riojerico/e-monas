@@ -49,8 +49,14 @@
             </div>
             <div class="mdc-list-item mdc-drawer-item">
               <a class="mdc-drawer-link" href="{{ route('lap.monev') }}">
-                <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">local_printshop</i>
+                <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">web</i>
                 Laporan Monev
+              </a>
+            </div>
+            <div class="mdc-list-item mdc-drawer-item">
+              <a class="mdc-drawer-link" href="{{ route('lap.monev') }}">
+                <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">supervisor_account  </i>
+                User Management
               </a>
             </div>
           </nav>
