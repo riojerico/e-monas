@@ -7,14 +7,31 @@ use DB;
 
 class MainLkkaController extends Controller
 {
-    public function LKKA_View(){
+    public function LKKA_View(Request $request){
+
+
+
+
     	$program = DB::table('view_lkka_raw')->select('id_prog','kode_prog','nama_program')->distinct()->orderBy('kode_prog')->get();
 
         $curr_year = date("Y");
         $first_day = date("Y-m-d", strtotime("first day of January"));
         $first_day_month = date("Y-m-d", strtotime("first day of this month"));
-        $curr_month = date('Y-m-d');
-        $prev_month = date('Y-m',strtotime("-1 month"));
+
+        if (isset($request->month)) {
+            $curr_month = date('Y-'.$request->month.'-t');
+            $prev_month = date('Y-'.$request->month,strtotime("-1 month"));
+            $month_select = $request->month;
+        }else{
+            $curr_month = date('Y-m-d'); 
+            $prev_month = date('Y-m',strtotime("-1 month"));
+            $month_select = '';
+        }
+        
+
+        
+
+        $curr_month_only = date('m');
 
         //view_trans_sp2d_akun untuk ambil data realisasi dari sp2d SPAN
         $trans_sp2d_akun = DB::table('view_trans_sp2d_akun')->get();
@@ -464,6 +481,7 @@ class MainLkkaController extends Controller
       
 
       return view('pages.lkka', compact(
+            'curr_month_only','month_select',
             'program',
                 'pagu_program',
                 'real_prog_last','real_prog_curr','real_prog_tott',

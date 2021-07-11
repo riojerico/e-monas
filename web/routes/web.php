@@ -60,6 +60,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 	Route::get('/lkka', [MainLkkaController::class, 'LKKA_View'])->name('lkka');	
 
+	Route::post('/lkka/{month}', [LkkaController::class, 'LKKA_View'])->name('month_select');
+
 	######### LKKA #############
 
 

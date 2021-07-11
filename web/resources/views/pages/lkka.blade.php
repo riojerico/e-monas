@@ -8,6 +8,133 @@
         <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
           <div class="mdc-card p-0">
             <h6 class="card-title card-padding pb-0">Laporan Keadaan Kas</h6>
+
+            <div class="mdc-layout-grid">
+                <?php
+                  $curr_month_only;                  
+                ?>
+                <div class="col-md-5">
+                  <form id="select_month_form">
+
+                  @csrf() 
+
+
+                  <select required name="month" id="select_month" class="mdc-list-item mdc-list-item--selected" >
+                    <?php
+                    if ($month_select == '01') {
+                      ?>
+                      <option value="01">Januari</option>
+                      <?php
+                    }elseif ($month_select == '02') {
+                      ?>
+                      <option value="02">Februari</option>
+                      <?php
+                    }elseif ($month_select == '03') {
+                      ?>
+                      <option value="03">Maret</option>
+                      <?php
+                    }elseif ($month_select == '04') {
+                      ?>
+                      <option value="04">April</option>
+                      <?php
+                    }elseif ($month_select == '05') {
+                      ?>
+                      <option value="05">Mei</option>
+                      <?php
+                    }elseif ($month_select == '06') {
+                      ?>
+                      <option value="06">Juni</option>
+                      <?php
+                    }elseif ($month_select == '07') {
+                      ?>
+                      <option value="07">Juli</option>
+                      <?php
+                    }elseif ($month_select == '08') {
+                      ?>
+                      <option value="08">Agustus</option>
+                      <?php
+                    }elseif ($month_select == '09') {
+                      ?>
+                      <option value="09">September</option>
+                      <?php
+                    }elseif ($month_select == '10') {
+                      ?>
+                      <option value="10">Oktober</option>
+                      <?php
+                    }elseif ($month_select == '11') {
+                      ?>
+                      <option value="11">November</option>
+                      <?php
+                    }elseif ($month_select == '12') {
+                      ?>
+                      <option value="12">Desember</option>
+                      <?php
+                    }
+                    ?>
+
+                    <option value='{{ $curr_month_only }}'>- Bulan Ini -</option>
+                    <?php
+                    for ($i=1; $i < $curr_month_only ; $i++) { 
+                      if ($i==1) {
+                        ?>
+                        <option value="01">Januari</option>
+                        <?php
+                      }elseif ($i==2) {
+                        ?>
+                        <option value="02">Februari</option>
+                        <?php
+                      }elseif ($i==3) {
+                        ?>
+                        <option value="03">Maret</option>
+                        <?php
+                      }elseif ($i==4) {
+                        ?>
+                        <option value="04">April</option>
+                        <?php
+                      }elseif ($i==5) {
+                        ?>
+                        <option value="05">Mei</option>
+                        <?php
+                      }elseif ($i==6) {
+                        ?>
+                        <option value="06">Juni</option>
+                        <?php
+                      }elseif ($i==7) {
+                        ?>
+                        <option value="07">Juli</option>
+                        <?php
+                      }elseif ($i==8) {
+                        ?>
+                        <option value="08">Agustus</option>
+                        <?php
+                      }elseif ($i==9) {
+                        ?>
+                        <option value="09">September</option>
+                        <?php
+                      }elseif ($i==10) {
+                        ?>
+                        <option value="10">Oktober</option>
+                        <?php
+                      }elseif ($i==11) {
+                        ?>
+                        <option value="11">November</option>
+                        <?php
+                      }elseif ($i==12) {
+                        ?>
+                        <option value="12">Desember</option>
+                        <?php
+                      }
+
+            
+                    }
+                    ?>
+                     
+                  </select> 
+                  </form>
+                </div>
+       
+            </div>
+
             <div class="table-responsive">
               <table class="table table-hoverable">
                 <thead>
@@ -291,3 +418,16 @@
   <!-- partial -->
 </div>
 @endsection
+
+@push('js-pages')
+
+
+<script type="text/javascript">
+  $('#select_month').on('change', function(e){
+      var select = $(this), form = select.closest('form');
+      form.attr('post', 'lkka/' + select.val());
+      form.submit();
+  });
+</script>
+  
+@endpush
